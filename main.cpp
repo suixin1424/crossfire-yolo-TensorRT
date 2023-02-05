@@ -39,6 +39,9 @@ int main(int argc, char** argv) {
         {
             pid.rec();
         }
+        delete []Boxes;
+        delete []BboxNum;
+        delete []ClassIndexs;
     }
     dxgi.release();
     return 0;
