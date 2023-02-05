@@ -175,8 +175,8 @@ void dxgi_cap::saveDesktopImage(ID3D11Texture2D* data, ID3D11Device* device, ID3
     //auto start = std::chrono::system_clock::now();
     int width = 416;
     int height = 416;
-    int left = 1920 / 2 - width / 2;
-    int top = 1080 / 2 - height / 2;
+    int left = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2;
+    int top = GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2;
     cv::Rect rect(left, top, width, height);
     /*auto end = std::chrono::system_clock::now();
     std::cout << ((std::chrono::duration_cast<std::chrono::milliseconds>
