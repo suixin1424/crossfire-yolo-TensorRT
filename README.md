@@ -1,5 +1,6 @@
 # cf-yolo-trt  
-基于yolov5-trt的穿越火线ai自瞄  
+理论支持yolo全系列模型
+基于yolo-trt的穿越火线ai自瞄  
 相关功能都已封装成类，方便后续开发使用  
 目前有三个类  
 dxgi_cap类，负责截图  
