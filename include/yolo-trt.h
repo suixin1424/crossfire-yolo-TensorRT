@@ -57,8 +57,7 @@ public:
         bool fixed_shape,
         bool scale_up);
     float* blobFromImage(cv::Mat& img);
-    void draw_objects(const cv::Mat& img, float* Boxes, int* ClassIndexs, int* BboxNum);
-    void Init(char* model_path);
+    void draw_objects(const cv::Mat& img, float* Boxes, int* ClassIndexs, int* BboxNum,int where);
     void Infer(
         int aWidth,
         int aHeight,
