@@ -61,9 +61,9 @@ message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 include_directories(${OpenCV_INCLUDE_DIRS})
 link_directories(${TRT_DIR}\\lib)
 
-add_executable(yolo ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/dxgi-cap.cpp ${PROJECT_SOURCE_DIR}/pid.cpp ${PROJECT_SOURCE_DIR}/yolo-trt.cpp ${PROJECT_SOURCE_DIR}/include/dxgi-cap.h ${PROJECT_SOURCE_DIR}/include/pid.h ${PROJECT_SOURCE_DIR}/include/yolo-trt.h) 
+add_executable(yolo ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/dxgi-cap.cpp ${PROJECT_SOURCE_DIR}/mouse.cpp ${PROJECT_SOURCE_DIR}/yolo-trt.cpp ${PROJECT_SOURCE_DIR}/include/dxgi-cap.h ${PROJECT_SOURCE_DIR}/include/mouse.h ${PROJECT_SOURCE_DIR}/include/yolo-trt.h) 
 
 target_link_libraries(yolo "nvinfer" "nvinfer_plugin")  
 target_link_libraries(yolo ${OpenCV_LIBS})     
 target_link_libraries(yolo ${CUDA_LIBRARIES})  
-target_link_libraries(yolo Threads::Threads)     
+target_link_libraries(yolo Threads::Threads) 
