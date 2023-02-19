@@ -62,17 +62,19 @@ float* Yolo::blobFromImage(cv::Mat& img) {
 }
 
 
-void Yolo::draw_objects(const cv::Mat& img, float* Boxes, int* ClassIndexs, int* BboxNum) {
+void Yolo::draw_objects(const cv::Mat& img, float* Boxes, int* ClassIndexs, int* BboxNum, int where) {
     for (int j = 0; j < BboxNum[0]; j++) {
+        if (ClassIndexs[j] != where)
+            continue;
         cv::Rect rect(Boxes[j * 4], Boxes[j * 4 + 1], Boxes[j * 4 + 2], Boxes[j * 4 + 3]);
         cv::rectangle(img, rect, cv::Scalar(0x27, 0xC1, 0x36), 2);
         cv::putText(
             img,
-            std::to_string(ClassIndexs[j]),
-            cv::Point(rect.x, rect.y - 1),
+            "enermy",
+            cv::Point(rect.x, rect.y - 5),
             cv::FONT_HERSHEY_PLAIN,
-            1.2,
-            cv::Scalar(0xFF, 0xFF, 0xFF),
+            1.5,
+            cv::Scalar(0, 0, 255),
             2);
         //cv::imwrite("result.jpg", img);
     }
