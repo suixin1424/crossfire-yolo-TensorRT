@@ -31,7 +31,7 @@ private:
     double R_;
     double K_;
 };
-int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead)
+int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead,int is_use_hardware)
 {
 	int min_value = 9999;
 	cv::Rect aim;
@@ -78,6 +78,37 @@ int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, i
     double filteredY = kf.update(offset_y);
     if (abs(filteredX) < 250 && abs(filteredX) < 250 && abs(filteredY) > 0 && abs(filteredY) > 0)
     {
-        mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
+        if (is_use_hardware)
+        {
+            move_by_port(filteredX, filteredY);
+        }
+        else
+        {
+            mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
+        }
     }
+}
+
+int mouse_control::init_port()
+{
+    if (!com.openSyn("\\\\.\\COM14", CBR_115200, NOPARITY, 8, ONESTOPBIT))
+    {
+        cout << com.getSerialLastError() << endl;
+        getchar();
+        return 0;
+    }
+    return 1;
+}
+
+int mouse_control::close_port()
+{
+    com.closeComm();
+    return 0;
+}
+
+void mouse_control::move_by_port(int x, int y)
+{
+    string data = to_string(x) + ":" + to_string(-y) + "x";
+    //cout << data << endl;
+    com.writeStr(data);
 }

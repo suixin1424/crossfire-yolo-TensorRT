@@ -3,6 +3,7 @@
 #include<windows.h>
 #include<opencv2/opencv.hpp>
 #include<math.h>
+#include<serial.h>
 
 using cv::Mat;
 using std::cout;
@@ -11,7 +12,10 @@ using std::endl;
 class mouse_control
 {
 private:
-	
+	SerialInterface com;
 public:
-	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead);
+	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead, int is_use_hardware);
+	int init_port();
+	int close_port();
+	void move_by_port(int x, int y);
 };

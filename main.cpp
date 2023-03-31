@@ -18,9 +18,12 @@ int main(int argc, char** argv) {
     dxgi.init();
     int is_show_windows = 0;
     int where = 0;//默认为身
+    int is_use_hardware = 0;
+    pid.init_port();
     cout << "是否显示窗口" << endl;
     cin >> is_show_windows;
     cout << "开始游戏吧" << endl;
+    int n = 0;
     while (1)
     {
         auto start = std::chrono::system_clock::now();
@@ -46,7 +49,7 @@ int main(int argc, char** argv) {
         }
         if (BboxNum > 0 && KEY_DOWN(VK_MBUTTON))
         {
-            pid.fire(frame,Boxes, ClassIndexs, BboxNum, where);
+            pid.fire(frame,Boxes, ClassIndexs, BboxNum, where, is_use_hardware);
         }
         if (is_show_windows)
         {
@@ -63,10 +66,33 @@ int main(int argc, char** argv) {
             }
             waitKey(1);
         }
+        if (KEY_DOWN(VK_HOME) && is_use_hardware == 0)
+        {
+            is_use_hardware = 1;
+            cout << "使用硬件鼠标" << endl;
+        }
+        if (KEY_DOWN(VK_END) && is_use_hardware == 1)
+        {
+            is_use_hardware = 0;
+            cout << "使用系统函数" << endl;
+        }
+        if (is_use_hardware == 1)
+        {
+            if (n >= 3000)
+            {
+                //cout << 1 << endl;
+                n = 0;
+                pid.close_port();
+                pid.init_port();
+            }
+            n++;
+        }
         delete []Boxes;
         delete []BboxNum;
         delete []ClassIndexs;
+        
     }
     dxgi.release();
+    pid.close_port();
     return 0;
 }
