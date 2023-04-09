@@ -1,8 +1,5 @@
-#include<yolo-trt.h>
+#include<config.h>
 
-#include <dxgi-cap.h>
-
-#include<mouse.h>
 
 using cv::Mat;
 using std::cout;
@@ -11,88 +8,18 @@ using std::endl;
 
 
 int main(int argc, char** argv) {
-    char* model_path = "D:/2/cf/cpp/end2end/build/Release/cf.trt";
-    dxgi_cap dxgi;
-    Yolo yolo(model_path);
-    mouse_control pid;
-    dxgi.init();
-    int is_show_windows = 0;
-    int where = 0;//默认为身
-    int is_use_hardware = 0;
-    pid.init_port();
+    options option;
+    option.init();
     cout << "是否显示窗口" << endl;
-    cin >> is_show_windows;
+    cin >> option.is_show_windows;
     cout << "开始游戏吧" << endl;
-    int n = 0;
-    while (1)
-    {
-        auto start = std::chrono::system_clock::now();
-        cv::Mat frame = dxgi.get_img(do_not_show_windows);
-        if (frame.empty())
-        {
-            break;
-        }
-        float* Boxes = new float[4000];
-        int* BboxNum = new int[1];
-        int* ClassIndexs = new int[1000];
-        //run inference
-        yolo.Infer(frame.cols, frame.rows, frame.channels(), frame.data, Boxes, ClassIndexs, BboxNum);
-        auto end = std::chrono::system_clock::now();
-        //cout << "FPS: " << 1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
-        if (KEY_DOWN(VK_UP) && where == 0) {
-            where = 1;
-            std::cout << "头"<< std::endl;
-        }
-        else if (KEY_DOWN(VK_DOWN) && where == 1) {
-            where = 0;
-            std::cout << "身" << std::endl;
-        }
-        if (BboxNum > 0 && KEY_DOWN(VK_MBUTTON))
-        {
-            pid.fire(frame,Boxes, ClassIndexs, BboxNum, where, is_use_hardware);
-        }
-        if (is_show_windows)
-        {
-            yolo.draw_objects(frame, Boxes, ClassIndexs, BboxNum,where);
-            putText(frame, "fps:" + std::to_string(1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()), Point(10, 50), FONT_HERSHEY_PLAIN, 1.6, Scalar(0, 0, 255), 2);
-            imshow("img", frame);
-            HWND hWnd = (HWND)cvGetWindowHandle("img");
-            HWND hRawWnd = ::GetParent(hWnd);
 
-            if (NULL != hRawWnd)
-            {
-                BOOL bRet = ::SetWindowPos(hRawWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-                assert(bRet);
-            }
-            waitKey(1);
-        }
-        if (KEY_DOWN(VK_HOME) && is_use_hardware == 0)
-        {
-            is_use_hardware = 1;
-            cout << "使用硬件鼠标" << endl;
-        }
-        if (KEY_DOWN(VK_END) && is_use_hardware == 1)
-        {
-            is_use_hardware = 0;
-            cout << "使用系统函数" << endl;
-        }
-        if (is_use_hardware == 1)
-        {
-            if (n >= 3000)
-            {
-                //cout << 1 << endl;
-                n = 0;
-                pid.close_port();
-                pid.init_port();
-            }
-            n++;
-        }
-        delete []Boxes;
-        delete []BboxNum;
-        delete []ClassIndexs;
-        
-    }
-    dxgi.release();
-    pid.close_port();
+    std::thread main_Thread(&options::sendWrapper, &option);
+    std::thread move_Thread(&mouse_control::receiveWrapper, &option.pid);
+    std::thread auto_fire_Thread(&auto_fire::receive1Wrapper, &option.pid.Auto_fire);
+
+    main_Thread.join();
+    move_Thread.join();
+    auto_fire_Thread.join();
     return 0;
 }

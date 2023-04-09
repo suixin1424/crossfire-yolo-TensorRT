@@ -4,6 +4,7 @@
 #include<opencv2/opencv.hpp>
 #include<math.h>
 #include<serial.h>
+#include<auto-fire.h>
 
 using cv::Mat;
 using std::cout;
@@ -12,10 +13,20 @@ using std::endl;
 class mouse_control
 {
 private:
-	SerialInterface com;
+
+	float offset_x = 0;
+	float offset_y = 0;
+	std::mutex data_mutex_;
+	std::condition_variable data_cond_;
+	bool data_ready_ = false;
 public:
-	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead, int is_use_hardware);
-	int init_port();
-	int close_port();
-	void move_by_port(int x, int y);
+	auto_fire Auto_fire;
+	static void receiveWrapper(mouse_control* pid) {
+		pid->move_mouse();
+	}
+	int isHead = 0;//Ä¬ÈÏÎªÉí
+	int is_use_hardware = 0;
+	int is_auto_fire = 0;
+	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum);
+	void move_mouse();
 };

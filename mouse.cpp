@@ -31,7 +31,7 @@ private:
     double R_;
     double K_;
 };
-int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, int isHead,int is_use_hardware)
+int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum)
 {
 	int min_value = 9999;
 	cv::Rect aim;
@@ -63,8 +63,8 @@ int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, i
 	float w = aim.width / 416.0f;
 	float h = aim.height / 416.0f;
     
-    float offset_x = pos_x * 416;
-    float offset_y = pos_y * 416;
+    offset_x = pos_x * 416;
+    offset_y = pos_y * 416;
     if (isHead == 1)
     {
     offset_y = ((pos_y) * 416);
@@ -73,42 +73,66 @@ int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum, i
     {
     offset_y = ((pos_y - w * 0.3) * 416);
     }
-    KalmanFilter kf;
-    double filteredX = kf.update(offset_x);
-    double filteredY = kf.update(offset_y);
-    if (abs(filteredX) < 250 && abs(filteredX) < 250 && abs(filteredY) > 0 && abs(filteredY) > 0)
     {
-        if (is_use_hardware)
+        //std::lock_guard<std::mutex> lock(data_mutex_);
+        data_ready_ = true;
+    }
+    data_cond_.notify_one();
+}
+
+
+
+void mouse_control::move_mouse()
+{
+    while (1)
+    {
+        std::unique_lock<std::mutex> lock(data_mutex_);
+        data_cond_.wait(lock, [this] { return data_ready_; });
+        KalmanFilter kf;
+        double filteredX = kf.update(offset_x);
+        double filteredY = kf.update(offset_y);
+        if (abs(filteredX) < 250 && abs(filteredX) < 250 && abs(filteredY) > 0 && abs(filteredY) > 0)
         {
-            move_by_port(filteredX, filteredY);
+            if (is_use_hardware)
+            {
+                //mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
+                Auto_fire.move_by_port(filteredX, filteredY);
+                if (is_auto_fire == 1)
+                {
+                    Auto_fire.x = filteredX;
+                    Auto_fire.y = filteredY;
+                    /*{
+                        std::lock_guard<std::mutex> lock(Auto_fire.data_mutex_);
+                        Auto_fire.data_ready_ = true;
+                    }*/
+                    Auto_fire.data_cond_.notify_one();
+                }
+                else
+                {
+                    Auto_fire.data_ready_ = false;
+                }
+            }
+            else
+            {
+                //cout << filteredX << "  " << filteredY << endl;
+                mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
+                if (is_auto_fire == 1)
+                {
+                    Auto_fire.x = filteredX;
+                    Auto_fire.y = filteredY;
+                    {
+                        //std::lock_guard<std::mutex> lock(Auto_fire.data_mutex_);
+                        Auto_fire.data_ready_ = true;
+                    }
+                    Auto_fire.data_cond_.notify_one();
+                }
+                else
+                {
+                    Auto_fire.data_ready_ = false;
+                }
+            }
         }
-        else
-        {
-            mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
-        }
+        data_ready_ = false;
     }
 }
 
-int mouse_control::init_port()
-{
-    if (!com.openSyn("\\\\.\\COM14", CBR_115200, NOPARITY, 8, ONESTOPBIT))
-    {
-        cout << com.getSerialLastError() << endl;
-        getchar();
-        return 0;
-    }
-    return 1;
-}
-
-int mouse_control::close_port()
-{
-    com.closeComm();
-    return 0;
-}
-
-void mouse_control::move_by_port(int x, int y)
-{
-    string data = to_string(x) + ":" + to_string(-y) + "x";
-    //cout << data << endl;
-    com.writeStr(data);
-}
