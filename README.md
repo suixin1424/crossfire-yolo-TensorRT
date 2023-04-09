@@ -5,7 +5,7 @@
 需自备arduino leonardo设备  
 刷入arduino文件夹内文件  
 修改auto-fire.cpp第32行，将串口改为你的arduino设备串口  
-修改config.h第11行，将trt文件路径改为你自己的路径
+修改config.h第11行，将trt文件路径改为你自己的路径  
 main函数中有三个线程，分别为截图+推理，鼠标移动，自动开火  
   
   
