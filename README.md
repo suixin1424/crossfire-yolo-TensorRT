@@ -1,4 +1,4 @@
-# crossfire-yolo-TebsorRT   
+# crossfire-yolo-TensorRT   
 理论支持yolo全系列模型  
 基于yolo-trt的穿越火线ai自瞄  
 使用方法： 
