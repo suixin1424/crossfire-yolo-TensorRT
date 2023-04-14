@@ -15,7 +15,7 @@ private:
 	Yolo yolo = Yolo(model_path);
 
 public:
-	mouse_control pid;
+	mouse_control mouse;
 	void init();
 	static void sendWrapper(options* option) 
 	{
