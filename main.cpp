@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
     main_Thread.join();
     move_Thread_x.join();
-    //move_Thread_y.join();
+    move_Thread_y.join();
     //move_Thread.join();
     auto_fire_Thread.join();
     return 0;
