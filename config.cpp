@@ -4,8 +4,8 @@ void options::init()
 {
     dxgi.init();
     mouse.Auto_fire.init_port();
-    mouse.pid_x.init(0.4, 0.2, 0.31, 1);
-    mouse.pid_y.init(0.4, 0.2, 0.2, 2);
+    mouse.pid_x.init(0.4, 0.2, 0.31, X_);
+    mouse.pid_y.init(0.4, 0.2, 0.2, Y_);
 }
 
 void options::main_function()
