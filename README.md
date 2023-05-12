@@ -18,3 +18,4 @@ main函数中有四个线程，分别为截图+推理，x方向鼠标移动，y�
 欢迎各位开发者共同改进  
 pt转trt可参考https://github.com/Linaom1214/TensorRT-For-YOLO-Series  
 cmake编译可参考https://github.com/Monday-Leo/Yolov5_Tensorrt_Win10  
+cf被封机器码了，解封再更新  
