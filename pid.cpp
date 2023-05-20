@@ -6,6 +6,7 @@ void pid_move::move()
     {
         std::unique_lock<std::mutex> lock(data_mutex_);
         data_cond_.wait(lock, [this] { return data_ready_; });
+        is_moving = true;
         //std::cout << Type << " " << target_position << " " << Kp << " " << std::endl;
             // 计算误差
             error_x = target_position_x - position_x;
@@ -28,8 +29,8 @@ void pid_move::move()
             double control_y = Kp * error_y + Ki * integral_y + Kd * derivative_y;
 
             // 假设控制器的输出为移动的距离
-            double move_distance_x = control_x;
-            double move_distance_y = control_y;
+            move_distance_x = control_x;
+            move_distance_y = control_y;
              mouse_event(MOUSEEVENTF_MOVE, move_distance_x, move_distance_y, 0, 0);
 
             // 更新位置
@@ -38,6 +39,7 @@ void pid_move::move()
         //std::cout << 1 << std::endl;
         //refresh();
         data_ready_ = false;
+        is_moving = false;
     }
 }
 
@@ -49,6 +51,8 @@ void pid_move::refresh()
     position_y = 0.0;
     integral_y = 0.0;
     last_error_y = 0.0;
+    move_distance_x = 0;
+    move_distance_y = 0;
 }
 
 void pid_move::init(double kp, double ki, double kd)
@@ -56,4 +60,15 @@ void pid_move::init(double kp, double ki, double kd)
     Kp = kp;
     Ki = ki;
     Kd = kd;
+}
+
+void pid_move::smooth()
+{
+    while (1)
+    {
+        if (is_moving)
+            continue;
+        mouse_event(MOUSEEVENTF_MOVE, sqrt(move_distance_x), sqrt(move_distance_y), 0, 0);
+        std::cout << 1 << std::endl;
+    }
 }

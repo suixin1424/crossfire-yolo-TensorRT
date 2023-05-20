@@ -27,6 +27,7 @@ private:
 public:
 	auto_fire Auto_fire;
 	pid_move pid;
+	pid_move mouse_smooth;
 	//static void receiveWrapper(mouse_control* mouse) {
 	//	mouse->move_mouse();
 	//}
