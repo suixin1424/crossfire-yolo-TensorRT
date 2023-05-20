@@ -14,7 +14,7 @@ main函数中有三个线程，分别为截图+推理，鼠标移动，鼠标移
 自动开火功能必须要求有arduino leonardo设备，否则无法使用  
   
   
-下一步目标是增加目标追踪，以解决多个目标之间乱晃的问题  
+下一步目标是优化鼠标移动，使其更像真人操作，防止行为检测  
 欢迎各位开发者共同改进  
 pt转trt可参考https://github.com/Linaom1214/TensorRT-For-YOLO-Series  
 cmake编译可参考https://github.com/Monday-Leo/Yolov5_Tensorrt_Win10  
