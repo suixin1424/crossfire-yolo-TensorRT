@@ -76,18 +76,18 @@ int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum)
     {
     offset_y = ((pos_y - w * 0.3) * 416);
     }
-    pid_x.target_position = offset_x;
-    pid_y.target_position = offset_y;
+    pid.target_position_x = offset_x;
+    //cout << "o: " << offset_x << "a: " << pid_x.target_position << endl;
+    pid.target_position_y = offset_y;
     //cout << offset_x << " " << pid_x.target_position << endl;
     {
         //std::lock_guard<std::mutex> lock(data_mutex_);
-        pid_x.data_ready_ = true;
-        pid_y.data_ready_ = true;
+        pid.data_ready_ = true;
     }
-    pid_x.data_cond_.notify_one();
-    pid_y.data_cond_.notify_one();
+    pid.data_cond_.notify_one();
     //cout << pid_x.data_ready_ << endl;
 }
+
 
 
 

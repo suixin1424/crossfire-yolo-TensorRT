@@ -5,10 +5,13 @@
 #include<yolo-trt.h>
 #include<mouse.h>
 
+#define X_ 1
+#define Y_ 2
+
 class options
 {
 private:
-	char* model_path = "D:/2/cf/cpp/end2end/build/Release/cf.trt";
+	char* model_path = "./cf.trt";
 	dxgi_cap dxgi;
 
 	int n = 0;

@@ -23,11 +23,10 @@ private:
 	std::mutex data_mutex_;
 	std::condition_variable data_cond_;
 	bool data_ready_ = false;
-
+	float pi = 3.1416;
 public:
 	auto_fire Auto_fire;
-	pid_move pid_x;
-	pid_move pid_y;
+	pid_move pid;
 	//static void receiveWrapper(mouse_control* mouse) {
 	//	mouse->move_mouse();
 	//}
@@ -36,4 +35,5 @@ public:
 	int is_auto_fire = 0;
 	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum);
 	//void move_mouse();
+	//float fov(float delta_x);
 };

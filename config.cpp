@@ -4,8 +4,7 @@ void options::init()
 {
     dxgi.init();
     mouse.Auto_fire.init_port();
-    mouse.pid_x.init(0.4, 0.2, 0.31, X_);
-    mouse.pid_y.init(0.4, 0.2, 0.2, Y_);
+    mouse.pid.init(0.2, 0.01, 0.07);
 }
 
 void options::main_function()
@@ -17,13 +16,19 @@ void options::main_function()
         cv::Mat frame = dxgi.get_img(do_not_show_windows);
         if (frame.empty())
         {
-            break;
+            continue;
         }
         float* Boxes = new float[4000];
         int* BboxNum = new int[1];
         int* ClassIndexs = new int[1000];
         //run inference
         yolo.Infer(frame.cols, frame.rows, frame.channels(), frame.data, Boxes, ClassIndexs, BboxNum);
+        //cout << BboxNum[0] << endl;
+        //for (int j = 0; j < BboxNum[0]; j++) {
+        //    //cout << ClassIndexs[j] << endl;
+        //    if (ClassIndexs[j] == 1)
+        //        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        //}
         auto end = std::chrono::system_clock::now();
         //cout << "FPS: " << 1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
         if (KEY_DOWN(VK_UP) && mouse.isHead == 0) {
@@ -46,25 +51,31 @@ void options::main_function()
         {
             mouse.fire(frame, Boxes, ClassIndexs, BboxNum);
         }
+        else
+        {
+            mouse.pid.refresh();
+        }
         if (is_show_windows)
         {
             yolo.draw_objects(frame, Boxes, ClassIndexs, BboxNum, mouse.isHead);
             putText(frame, "fps:" + std::to_string(1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()), Point(10, 50), FONT_HERSHEY_PLAIN, 1.6, Scalar(0, 0, 255), 2);
             imshow("img", frame);
-            HWND hWnd = (HWND)cvGetWindowHandle("img");
-            HWND hRawWnd = ::GetParent(hWnd);
+            //HWND hWnd = (HWND)cvGetWindowHandle("img");
+            //HWND hRawWnd = ::GetParent(hWnd);
 
-            if (NULL != hRawWnd)
-            {
-                BOOL bRet = ::SetWindowPos(hRawWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-                assert(bRet);
-            }
+            //if (NULL != hRawWnd)
+            //{
+            //    BOOL bRet = ::SetWindowPos(hRawWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+            //    assert(bRet);
+            //}
             waitKey(1);
         }
         if (KEY_DOWN(VK_HOME) && mouse.is_use_hardware == 0)
         {
-            mouse.is_use_hardware = 1;
-            cout << "使用硬件鼠标" << endl;
+            dxgi.release();
+            dxgi.init();
+            //mouse.is_use_hardware = 1;
+            //cout << "使用硬件鼠标" << endl;
         }
         if (KEY_DOWN(VK_END) && mouse.is_use_hardware == 1)
         {
