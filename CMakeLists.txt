@@ -61,7 +61,7 @@ message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 include_directories(${OpenCV_INCLUDE_DIRS})
 link_directories(${TRT_DIR}\\lib)
 
-add_executable(yolo ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/dxgi-cap.cpp ${PROJECT_SOURCE_DIR}/mouse.cpp ${PROJECT_SOURCE_DIR}/yolo-trt.cpp ${PROJECT_SOURCE_DIR}/auto-fire.cpp ${PROJECT_SOURCE_DIR}/config.cpp ${PROJECT_SOURCE_DIR}/serial.cpp ${PROJECT_SOURCE_DIR}/include/dxgi-cap.h ${PROJECT_SOURCE_DIR}/include/mouse.h ${PROJECT_SOURCE_DIR}/include/yolo-trt.h ${PROJECT_SOURCE_DIR}/include/auto-fire.h ${PROJECT_SOURCE_DIR}/include/config.h ${PROJECT_SOURCE_DIR}/include/serial.h) 
+add_executable(yolo ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/pid.cpp ${PROJECT_SOURCE_DIR}/dxgi-cap.cpp ${PROJECT_SOURCE_DIR}/mouse.cpp ${PROJECT_SOURCE_DIR}/yolo-trt.cpp ${PROJECT_SOURCE_DIR}/auto-fire.cpp ${PROJECT_SOURCE_DIR}/config.cpp ${PROJECT_SOURCE_DIR}/serial.cpp ${PROJECT_SOURCE_DIR}/include/dxgi-cap.h ${PROJECT_SOURCE_DIR}/include/mouse.h ${PROJECT_SOURCE_DIR}/include/yolo-trt.h ${PROJECT_SOURCE_DIR}/include/auto-fire.h ${PROJECT_SOURCE_DIR}/include/config.h ${PROJECT_SOURCE_DIR}/include/serial.h ${PROJECT_SOURCE_DIR}/include/pid.h) 
 
 target_link_libraries(yolo "nvinfer" "nvinfer_plugin")  
 target_link_libraries(yolo ${OpenCV_LIBS})     
