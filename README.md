@@ -15,7 +15,7 @@ main函数中有四个线程，分别为截图+推理，鼠标移动，平滑鼠
 当前版本通过两个线程的鼠标移动相互补偿，实测能较好的过行为检测（庆祝！！！）  
   
   
-下一步目标是继续优化鼠标移动，使其更像真人操作，防止行为检测  
+下一步目标是程序根据本机自动设置最优pid参数    
 欢迎各位开发者共同改进  
 pt转trt可参考https://github.com/Linaom1214/TensorRT-For-YOLO-Series  
 cmake编译可参考https://github.com/Monday-Leo/Yolov5_Tensorrt_Win10  
