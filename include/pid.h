@@ -23,7 +23,7 @@ public:
     void init(double kp, double ki, double kd);
     void refresh();
     void smooth();
-    double move_distance_x = 0;
+    double move_distance_x = 0 ;
     double move_distance_y = 0;
 private:
     double Kp = 0.5;

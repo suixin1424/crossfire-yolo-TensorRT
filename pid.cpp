@@ -29,6 +29,7 @@ void pid_move::move()
             double control_y = Kp * error_y + Ki * integral_y + Kd * derivative_y;
 
             // 假设控制器的输出为移动的距离
+            //std::cout << move_distance_x << std::endl;
             move_distance_x = control_x;
             move_distance_y = control_y;
              mouse_event(MOUSEEVENTF_MOVE, move_distance_x, move_distance_y, 0, 0);
@@ -68,7 +69,7 @@ void pid_move::smooth()
     {
         if (is_moving)
             continue;
-        mouse_event(MOUSEEVENTF_MOVE, sqrt(move_distance_x), sqrt(move_distance_y), 0, 0);
-        std::cout << 1 << std::endl;
+        mouse_event(MOUSEEVENTF_MOVE, move_distance_x/sqrt((pow(move_distance_x,2)+pow(move_distance_y,2))), move_distance_y / sqrt((pow(move_distance_x, 2) + pow(move_distance_y, 2))), 0, 0);
+        //std::cout << move_distance_x<< " " <<move_distance_y << std::endl;
     }
 }
