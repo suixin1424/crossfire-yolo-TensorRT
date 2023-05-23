@@ -29,8 +29,6 @@ private:
     double Kp = 0.5;
     double Ki = 0.1;
     double Kd = 0.2;
-    double position_x = 0.0;
-    double position_y = 0.0;
     double error_x, integral_x = 0.0, derivative_x, last_error_x = 0.0;
     double error_y, integral_y = 0.0, derivative_y, last_error_y = 0.0;
 

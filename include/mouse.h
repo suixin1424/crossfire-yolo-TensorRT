@@ -3,8 +3,6 @@
 #include<windows.h>
 #include<opencv2/opencv.hpp>
 #include<math.h>
-#include<serial.h>
-#include<auto-fire.h>
 #include<pid.h>
 
 using cv::Mat;
@@ -25,16 +23,10 @@ private:
 	bool data_ready_ = false;
 	float pi = 3.1416;
 public:
-	auto_fire Auto_fire;
 	pid_move pid;
-	//pid_move mouse_smooth;
-	//static void receiveWrapper(mouse_control* mouse) {
-	//	mouse->move_mouse();
-	//}
+
 	int isHead = 0;//Ä¬ÈÏÎªÉí
 	int is_use_hardware = 0;
 	int is_auto_fire = 0;
 	int fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum);
-	//void move_mouse();
-	//float fov(float delta_x);
 };

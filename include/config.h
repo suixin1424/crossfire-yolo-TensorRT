@@ -14,7 +14,6 @@ private:
 	char* model_path = "./cf.trt";
 	dxgi_cap dxgi;
 
-	int n = 0;
 	Yolo yolo = Yolo(model_path);
 
 public:

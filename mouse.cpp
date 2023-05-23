@@ -1,48 +1,9 @@
 #include<mouse.h>
 
-
-
-class KalmanFilter
-{
-public:
-    KalmanFilter()
-    {
-        x_ = 0;
-        P_ = 1;
-        Q_ = 0.3;
-        R_ = 2;
-    }
-
-    double update(double measurement)
-    {
-        // Ô¤²â
-        x_ = x_;
-        P_ = P_ + Q_;
-
-        // ¸üÐÂ
-        K_ = P_ / (P_ + R_);
-        x_ = x_ + K_ * (measurement - x_);
-        P_ = (1 - K_) * P_;
-
-        return x_;
-    }
-
-private:
-    double x_;
-    double P_;
-    double Q_;
-    double R_;
-    double K_;
-};
 int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum)
 {
 	int min_value = 9999;
 	cv::Rect aim;
-	if (*BboxNum > 100)
-	{
-		cout << "too much aim" << endl;
-		return 0;
-	}
 	for (int i = 0; i < BboxNum[0]; i++)
 	{
 		if (ClassIndexs[i] != isHead)
@@ -77,73 +38,10 @@ int mouse_control::fire(Mat img, float* Boxes, int* ClassIndexs, int* BboxNum)
     offset_y = ((pos_y - w * 0.3) * 416);
     }
     pid.target_position_x = offset_x;
-    //cout << "o: " << offset_x << "a: " << pid_x.target_position << endl;
     pid.target_position_y = offset_y;
-    //cout << offset_x << " " << pid_x.target_position << endl;
     {
-        //std::lock_guard<std::mutex> lock(data_mutex_);
         pid.data_ready_ = true;
     }
     pid.data_cond_.notify_one();
-    //cout << pid_x.data_ready_ << endl;
 }
 
-
-
-
-//void mouse_control::move_mouse()
-//{
-//    while (1)
-//    {
-//        std::unique_lock<std::mutex> lock(data_mutex_);
-//        data_cond_.wait(lock, [this] { return data_ready_; });
-//        //KalmanFilter kf;
-//        //double filteredX = kf.update(offset_x);
-//        //double filteredY = kf.update(offset_y);
-//        //if (abs(filteredX) < 250 && abs(filteredX) < 250 && abs(filteredY) > 0 && abs(filteredY) > 0)
-//        //{
-//        //    if (is_use_hardware)
-//        //    {
-//        //        //mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
-//        //        Auto_fire.move_by_port(filteredX, filteredY);
-//        //        if (is_auto_fire == 1)
-//        //        {
-//        //            Auto_fire.x = filteredX;
-//        //            Auto_fire.y = filteredY;
-//        //            /*{
-//        //                std::lock_guard<std::mutex> lock(Auto_fire.data_mutex_);
-//        //                Auto_fire.data_ready_ = true;
-//        //            }*/
-//        //            Auto_fire.data_cond_.notify_one();
-//        //        }
-//        //        else
-//        //        {
-//        //            Auto_fire.data_ready_ = false;
-//        //        }
-//        //    }
-//        //    else
-//        //    {
-//        //        //cout << filteredX << "  " << filteredY << endl;
-//        //        mouse_event(MOUSEEVENTF_MOVE, filteredX, filteredY, 0, 0);
-//        //        if (is_auto_fire == 1)
-//        //        {
-//        //            Auto_fire.x = filteredX;
-//        //            Auto_fire.y = filteredY;
-//        //            {
-//        //                //std::lock_guard<std::mutex> lock(Auto_fire.data_mutex_);
-//        //                Auto_fire.data_ready_ = true;
-//        //            }
-//        //            Auto_fire.data_cond_.notify_one();
-//        //        }
-//        //        else
-//        //        {
-//        //            Auto_fire.data_ready_ = false;
-//        //        }
-//        //    }
-//        //}
-//
-//
-//
-//        data_ready_ = false;
-//    }
-//}
