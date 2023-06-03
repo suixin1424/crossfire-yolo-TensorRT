@@ -17,5 +17,5 @@ main函数中有三个线程，分别为截图+推理，鼠标移动，平滑鼠
   
 下一步目标是程序根据本机自动设置最优pid参数    
 欢迎各位开发者共同改进   
-cmake编译可参考https://github.com/Monday-Leo/Yolov5_Tensorrt_Win10  
+
  
