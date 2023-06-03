@@ -1,27 +1,52 @@
 #include<config.h>
 
+static const char* labels[] = {
+    "body", "head"
+};
+
 void options::init()
 {
-    dxgi.init();
+    cout << "请选择截图方式：0、1" << endl;
+    cin >> capture;
+    if (capture)
+        dxgi.init();
+    else
+        dc.init();
     mouse.pid.init(0.25, 0.05, 0.1);
 }
 
 void options::main_function()
 {
+    auto engine = Yolo::create_infer(
+        model_file,                // engine file
+        Yolo::Type::V5,                       // yolo type, Yolo::Type::V5 / Yolo::Type::X
+        0,                   // gpu id
+        0.25f,                      // confidence threshold
+        0.45f,                      // nms threshold
+        Yolo::NMSMethod::FastGPU,   // NMS method, fast GPU / CPU
+        1024,                       // max objects
+        true                       // preprocess use multi stream
+    );
+
+
     while (1)
     {
 
         auto start = std::chrono::system_clock::now();
-        cv::Mat frame = dxgi.get_img(do_not_show_windows);
+        cv::Mat frame;
+        if (capture)
+            frame = dxgi.get_img(do_not_show_windows);
+        else
+            frame = dc.CaptureScreen(do_not_show_windows);
         if (frame.empty())
         {
             continue;
         }
-        float* Boxes = new float[4000];
-        int* BboxNum = new int[1];
-        int* ClassIndexs = new int[1000];
-        //run inference
-        yolo.Infer(frame.cols, frame.rows, frame.channels(), frame.data, Boxes, ClassIndexs, BboxNum);
+        
+
+        auto box = engine->commit(frame).get();
+
+
         auto end = std::chrono::system_clock::now();
         //cout << "FPS: " << 1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
         if (KEY_DOWN(VK_UP) && mouse.isHead == 0) {
@@ -32,9 +57,9 @@ void options::main_function()
             mouse.isHead = 0;
             std::cout << "身" << std::endl;
         }
-        if (BboxNum > 0 && KEY_DOWN(VK_MBUTTON))
+        if ((!box.empty()) && KEY_DOWN(VK_MBUTTON))
         {
-            mouse.fire(frame, Boxes, ClassIndexs, BboxNum);
+            mouse.fire(frame, box);
         }
         else
         {
@@ -42,7 +67,7 @@ void options::main_function()
         }
         if (is_show_windows)
         {
-            yolo.draw_objects(frame, Boxes, ClassIndexs, BboxNum, mouse.isHead);
+            draw_objects(frame, box, mouse.isHead);
             putText(frame, "fps:" + std::to_string(1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()), Point(10, 50), FONT_HERSHEY_PLAIN, 1.6, Scalar(0, 0, 255), 2);
             imshow("img", frame);
             HWND hWnd = (HWND)cvGetWindowHandle("img");
@@ -60,11 +85,24 @@ void options::main_function()
             dxgi.release();
             dxgi.init();
         }
-        delete[]Boxes;
-        delete[]BboxNum;
-        delete[]ClassIndexs;
+
+
 
     }
-
+    engine.reset();
     dxgi.release();
+}
+
+
+void options::draw_objects(Mat img, ObjectDetector::BoxArray box, int is_head)
+{
+    for (auto& obj : box) {
+        if (obj.class_label != is_head)
+            continue;
+        cv::rectangle(img, cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom), cv::Scalar(0,255,255));
+
+        auto name = labels[obj.class_label];
+        auto caption = iLogger::format("%s %.2f", name, obj.confidence);
+        cv::putText(img, caption, cv::Point(obj.left, obj.top - 5), 0, 1, cv::Scalar(0,255,255));
+    }
 }

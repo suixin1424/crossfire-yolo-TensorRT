@@ -232,3 +232,64 @@ cv::Mat dxgi_cap::get_img(int is_show)
     }
     return img;
 }
+
+
+Mat dc_cap::CaptureScreen(int is_show_windows)
+{
+    // 获取屏幕设备上下文
+    HDC hScreenDC = GetDC(NULL);
+    // 创建内存设备上下文
+    HDC hMemDC = CreateCompatibleDC(hScreenDC);
+
+    // 创建位图对象
+    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
+
+    // 将位图选入内存设备上下文
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
+
+    // 将屏幕内容复制到内存设备上下文
+    BitBlt(hMemDC, 0, 0, width, height, hScreenDC, x, y, SRCCOPY);
+
+    // 恢复位图对象
+    hBitmap = (HBITMAP)SelectObject(hMemDC, hOldBitmap);
+
+    // 创建OpenCV Mat对象并将位图数据复制到其中
+    BITMAPINFO bitmapInfo;
+    bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmapInfo.bmiHeader.biWidth = width;
+    bitmapInfo.bmiHeader.biHeight = -height; // 负值表示顶部-左下角为原点
+    bitmapInfo.bmiHeader.biPlanes = 1;
+    bitmapInfo.bmiHeader.biBitCount = 24; // 每个像素3个字节（RGB）
+    bitmapInfo.bmiHeader.biCompression = BI_RGB;
+    bitmapInfo.bmiHeader.biSizeImage = 0;
+    bitmapInfo.bmiHeader.biXPelsPerMeter = 0;
+    bitmapInfo.bmiHeader.biYPelsPerMeter = 0;
+    bitmapInfo.bmiHeader.biClrUsed = 0;
+    bitmapInfo.bmiHeader.biClrImportant = 0;
+
+    cv::Mat mat(height, width, CV_8UC3);
+    GetDIBits(hMemDC, hBitmap, 0, height, mat.data, &bitmapInfo, DIB_RGB_COLORS);
+
+    if (is_show_windows)
+    {
+        imshow("img", mat);
+        waitKey(1);
+    }
+
+
+    // 清理资源
+    DeleteObject(hBitmap);
+    DeleteDC(hMemDC);
+    ReleaseDC(NULL, hScreenDC);
+
+    // 翻转图像以适应OpenCV的坐标系
+    //cv::flip(mat, mat, 0);
+
+    return mat;
+}
+
+void dc_cap::init()
+{
+    x = 960 - 416 / 2;
+    y = 540 - 416 / 2;
+}
