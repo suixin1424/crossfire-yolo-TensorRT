@@ -26,7 +26,7 @@ void pid_move::move()
 
         // 计算控制量
         double control_x = Kp * error_x + Ki * integral_x + Kd * derivative_x;
-        double control_y = Kp * error_y + Ki * integral_y + Kd * derivative_y;
+        double control_y = (Kp+0.1) * error_y + Ki * integral_y + Kd * derivative_y;
 
         // 假设控制器的输出为移动的距离
         move_distance_x = control_x;

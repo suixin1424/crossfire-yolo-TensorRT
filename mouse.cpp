@@ -1,21 +1,79 @@
 #include<mouse.h>
 
+cv::Rect enlargeRect(const cv::Rect& rect, float scale)
+{
+	int width = static_cast<int>(rect.width * scale);
+	int height = static_cast<int>(rect.height * scale);
+	int x = rect.x - static_cast<int>((width - rect.width) / 2);
+	int y = rect.y - static_cast<int>((height - rect.height) / 2);
+
+	return cv::Rect(x, y, width, height);
+}
+
 int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 {
-	int min_value = 9999;
-	cv::Rect aim;
-	for (auto& obj : box)
+	if (box.empty())
 	{
-		if (obj.class_label != isHead)
-			continue;
-
-		cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
-		if (sqrt(pow((rect.x - 208), 2) + pow((rect.y - 208), 2)) < min_value)
+		//cout << 1 << endl;
+		lost_frame++;
+	}
+	if (lost_frame >= 2)
+	{
+		is_first_frame = true;
+		lost_frame = 0;
+	}
+	if (box.size() <= 2)
+	{
+		for (auto& obj : box)
 		{
-			min_value = sqrt(pow((rect.x - 208), 2) + pow((rect.y - 208), 2));
+			if (obj.class_label != isHead)
+				continue;
+			cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
 			aim = rect;
 		}
 	}
+	else
+	{
+		float iou_max = 0;
+		for (auto& obj : box)
+		{
+			if (obj.class_label != isHead)
+				continue;
+
+			cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
+			//if (rect.area() > max_value)
+			//{
+			//	max_value = rect.area();
+			//	aim = rect;
+			//}
+			if (rect.contains(cv::Point2f(416 * 0.5, 416 * 0.5)))
+			{
+				aim = rect;
+				//cout << 1 << endl;
+			}
+			if (is_first_frame)
+			{
+
+				aim = rect;
+				is_first_frame = false;
+			}
+			else
+			{
+				float iou_temp = cal_iou(aim, rect, 1.5);
+				if (iou_temp == 0.f)
+					continue;
+				if (iou_temp > iou_max)
+				{
+					aim = rect;
+					iou_max = iou_temp;
+				}
+			}
+		}
+		//cout << iou_max << endl;
+		if (iou_max == 0.f)
+			lost_frame++;
+	}
+	cv::rectangle(img, aim, cv::Scalar(0, 255, 255));
 	if (aim.x == 0 && aim.y == 0)
 	{
 		//cout << "no aim" << endl;
@@ -44,4 +102,12 @@ int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 	}
 	pid.data_cond_.notify_one();
 }
-
+float mouse_control::cal_iou(cv::Rect rect1, cv::Rect rect2, float scale)
+{
+	cv::Rect rect_temp1 = enlargeRect(rect1, scale);
+	cv::Rect rect_temp2 = enlargeRect(rect2, scale);
+	cv::Rect intersection = rect_temp1 & rect_temp2;
+	float intersectionArea = intersection.area();
+	float unionArea = rect_temp1.area() + rect_temp2.area();
+	return  intersectionArea / unionArea;
+}

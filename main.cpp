@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char** argv){
     
     
-    string model_file = "cf.FP16.trtmodel";
+    string model_file = "./cf.FP16.trtmodel";
     string onnx_file = "cf.onnx";
 
     auto int8process = [=](int current, int count, const vector<string>& files, shared_ptr<TRT::Tensor>& tensor) {
@@ -20,8 +20,7 @@ int main(int argc, char** argv){
         }
     };
 
-
-    if (not iLogger::exists(model_file)) {
+    if (! iLogger::exists(model_file)) {
         TRT::compile(
             TRT::Mode::FP16,                       // FP32、FP16、INT8
             16,            // max batch size
@@ -35,7 +34,7 @@ int main(int argc, char** argv){
 
     options option;
     option.init();
-    cout << "is_show_windows?" << endl;
+    cout << "is show windows?" << endl;
     cin >> option.is_show_windows;
     cout << "ok" << endl;
 
