@@ -23,9 +23,14 @@ private:
 	std::condition_variable data_cond_;
 	bool data_ready_ = false;
 	float pi = 3.1416;
+	cv::Rect aim;
+	
+	
 public:
 	pid_move pid;
-
+	int lost_frame = 0;
+	bool is_first_frame = true;
+	float cal_iou(cv::Rect rect1, cv::Rect rect2, float scale);
 	int isHead = 0;//Ä¬ÈÏÎªÉí
 	int is_use_hardware = 0;
 	int is_auto_fire = 0;
