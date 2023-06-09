@@ -21,7 +21,7 @@ void options::main_function()
         model_file,                // engine file
         Yolo::Type::V5,                       // yolo type, Yolo::Type::V5 / Yolo::Type::X
         0,                   // gpu id
-        0.33f,                      // confidence threshold
+        0.4f,                      // confidence threshold
         0.45f,                      // nms threshold
         Yolo::NMSMethod::FastGPU,   // NMS method, fast GPU / CPU
         1024,                       // max objects
@@ -64,12 +64,11 @@ void options::main_function()
         else
         {
             mouse.is_first_frame = true;
-            mouse.lost_frame = 0;
             mouse.pid.refresh();
         }
         if (is_show_windows)
         {
-            //draw_objects(frame, box, mouse.isHead);
+            draw_objects(frame, box, mouse.isHead);
             putText(frame, "fps:" + std::to_string(1000 / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()), Point(10, 50), FONT_HERSHEY_PLAIN, 1.6, Scalar(0, 0, 255), 2);
             imshow("img", frame);
             HWND hWnd = (HWND)cvGetWindowHandle("img");

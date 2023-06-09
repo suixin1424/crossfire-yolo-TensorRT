@@ -1,5 +1,4 @@
 #include<mouse.h>
-
 cv::Rect enlargeRect(const cv::Rect& rect, float scale)
 {
 	int width = static_cast<int>(rect.width * scale);
@@ -12,72 +11,42 @@ cv::Rect enlargeRect(const cv::Rect& rect, float scale)
 
 int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 {
-	if (box.empty())
+	std::vector<cv::Rect> aims;
+	for (auto& obj : box)
 	{
-		//cout << 1 << endl;
-		lost_frame++;
+		if (obj.class_label != isHead)
+			continue;
+		cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
+		aims.push_back(rect);
 	}
-	if (lost_frame >= 2)
+	if (aims.empty())
+		return 0;
+	if (aims.size() == 1)
 	{
-		is_first_frame = true;
-		lost_frame = 0;
-	}
-	if (box.size() <= 2)
-	{
-		for (auto& obj : box)
-		{
-			if (obj.class_label != isHead)
-				continue;
-			cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
-			aim = rect;
-		}
+		aim = aims[0];
 	}
 	else
 	{
-		float iou_max = 0;
-		for (auto& obj : box)
+		if (is_first_frame)
 		{
-			if (obj.class_label != isHead)
-				continue;
-
-			cv::Rect rect(cv::Point(obj.left, obj.top), cv::Point(obj.right, obj.bottom));
-			//if (rect.area() > max_value)
-			//{
-			//	max_value = rect.area();
-			//	aim = rect;
-			//}
-			if (rect.contains(cv::Point2f(416 * 0.5, 416 * 0.5)))
+			aim = aims[0];
+			is_first_frame = false;
+		}
+		else
+		{
+			float iou_max = 0;
+			for (auto& obj : aims)
 			{
-				aim = rect;
-				//cout << 1 << endl;
-			}
-			if (is_first_frame)
-			{
-
-				aim = rect;
-				is_first_frame = false;
-			}
-			else
-			{
-				float iou_temp = cal_iou(aim, rect, 1.5);
-				if (iou_temp == 0.f)
-					continue;
+				int iou_temp = cal_iou(aim, obj, 2);
 				if (iou_temp > iou_max)
 				{
-					aim = rect;
 					iou_max = iou_temp;
+					aim = obj;
 				}
 			}
+			if (iou_max == 0)
+				is_first_frame = true;
 		}
-		//cout << iou_max << endl;
-		if (iou_max == 0.f)
-			lost_frame++;
-	}
-	cv::rectangle(img, aim, cv::Scalar(0, 255, 255));
-	if (aim.x == 0 && aim.y == 0)
-	{
-		//cout << "no aim" << endl;
-		return 0;
 	}
 	//rectangle(img, aim, cv::Scalar(0x27, 0xC1, 0x36), 2);
 	float pos_x = ((aim.x + aim.width / 2.0f - 208) / 416);
@@ -101,13 +70,16 @@ int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 		pid.data_ready_ = true;
 	}
 	pid.data_cond_.notify_one();
+	return 0;
 }
+
+
 float mouse_control::cal_iou(cv::Rect rect1, cv::Rect rect2, float scale)
 {
 	cv::Rect rect_temp1 = enlargeRect(rect1, scale);
 	cv::Rect rect_temp2 = enlargeRect(rect2, scale);
 	cv::Rect intersection = rect_temp1 & rect_temp2;
-	float intersectionArea = intersection.area();
+	float intersectionArea = intersection.area()- intersectionArea;
 	float unionArea = rect_temp1.area() + rect_temp2.area();
 	return  intersectionArea / unionArea;
 }
