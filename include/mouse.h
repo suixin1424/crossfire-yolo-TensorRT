@@ -4,7 +4,7 @@
 #include<opencv2/opencv.hpp>
 #include<math.h>
 #include<pid.h>
-#include <common/object_detector.hpp>
+#include <BYTETracker.h>
 
 using cv::Mat;
 using std::cout;
@@ -23,14 +23,11 @@ private:
 	std::condition_variable data_cond_;
 	bool data_ready_ = false;
 	float pi = 3.1416;
-	cv::Rect aim;
-	
-	
 public:
-	pid_move pid;
-	int lost_frame = 0;
-	bool is_first_frame = true;
 	float cal_iou(cv::Rect rect1, cv::Rect rect2, float scale);
+	bool is_first_frame = true;
+	cv::Rect aim;
+	pid_move pid;
 	int isHead = 0;//Ä¬ÈÏÎªÉí
 	int is_use_hardware = 0;
 	int is_auto_fire = 0;
