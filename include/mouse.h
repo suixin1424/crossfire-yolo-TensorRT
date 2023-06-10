@@ -24,7 +24,9 @@ private:
 	bool data_ready_ = false;
 	float pi = 3.1416;
 public:
-	float cal_iou(cv::Rect rect1, cv::Rect rect2, float scale);
+	int aims_last_num = 0;
+	int lost_frame = 0;
+	float cal_iou(cv::Rect rect1, cv::Rect rect2,float scale);
 	bool is_first_frame = true;
 	cv::Rect aim;
 	pid_move pid;
