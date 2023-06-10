@@ -4,7 +4,7 @@
 #include<opencv2/opencv.hpp>
 #include<math.h>
 #include<pid.h>
-#include <BYTETracker.h>
+#include <common/object_detector.hpp>
 
 using cv::Mat;
 using std::cout;
