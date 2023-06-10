@@ -21,33 +21,46 @@ int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 	}
 	if (aims.empty())
 		return 0;
-	if (aims.size() == 1)
+
+	if (lost_frame == 5)
 	{
+		is_first_frame = true;
+		lost_frame = 0;
+	}
+
+	if (is_first_frame)
+	{
+		//cout << 1 << endl;
 		aim = aims[0];
+		is_first_frame = false;
+		aims_last_num = aims.size();
 	}
 	else
 	{
-		if (is_first_frame)
+		float iou_max = 0;
+		cv::Rect aim_temp;
+		for (auto& obj : aims)
 		{
-			aim = aims[0];
-			is_first_frame = false;
+			cv::Rect rect_temp((obj.tl().x + (float)pid.move_distance_x), (obj.tl().y + (float)pid.move_distance_y), obj.width, obj.height);
+			//rectangle(img, rect_temp, cv::Scalar(0x27, 0xC1, 0x36), 2);
+			float iou_temp = cal_iou(aim, rect_temp,5);
+			//cout << iou_temp << " ";
+			if (iou_temp >= iou_max)
+			{
+				iou_max = iou_temp;
+				aim_temp = obj;
+			}
+		}
+		//cout << endl;
+		if (iou_max == 0 && (aims.size() != aims_last_num))
+		{
+			lost_frame++;
+			return 0;
 		}
 		else
-		{
-			float iou_max = 0;
-			for (auto& obj : aims)
-			{
-				int iou_temp = cal_iou(aim, obj, 2);
-				if (iou_temp > iou_max)
-				{
-					iou_max = iou_temp;
-					aim = obj;
-				}
-			}
-			if (iou_max == 0)
-				is_first_frame = true;
-		}
+			aim = aim_temp;
 	}
+	
 	//rectangle(img, aim, cv::Scalar(0x27, 0xC1, 0x36), 2);
 	float pos_x = ((aim.x + aim.width / 2.0f - 208) / 416);
 	float pos_y = ((aim.y + aim.height / 2.0f - 208) / 416);
@@ -74,12 +87,12 @@ int mouse_control::fire(Mat img, ObjectDetector::BoxArray box)
 }
 
 
-float mouse_control::cal_iou(cv::Rect rect1, cv::Rect rect2, float scale)
+float mouse_control::cal_iou(cv::Rect rect1, cv::Rect rect2,float scale)
 {
 	cv::Rect rect_temp1 = enlargeRect(rect1, scale);
 	cv::Rect rect_temp2 = enlargeRect(rect2, scale);
 	cv::Rect intersection = rect_temp1 & rect_temp2;
-	float intersectionArea = intersection.area()- intersectionArea;
-	float unionArea = rect_temp1.area() + rect_temp2.area();
+	float intersectionArea = intersection.area();
+	float unionArea = rect_temp1.area() + rect_temp2.area()-intersectionArea;
 	return  intersectionArea / unionArea;
 }

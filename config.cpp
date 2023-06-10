@@ -64,6 +64,7 @@ void options::main_function()
         else
         {
             mouse.is_first_frame = true;
+            mouse.lost_frame = 0;
             mouse.pid.refresh();
         }
         if (is_show_windows)
