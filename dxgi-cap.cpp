@@ -209,6 +209,8 @@ cv::Mat dxgi_cap::get_img(int is_show)
     // 截屏
     if (acquiredDesktopImage == nullptr)
     {
+        release();
+        init();
         return img;
     }
     saveDesktopImage(acquiredDesktopImage, device, deviceContext, &img);
@@ -236,6 +238,11 @@ cv::Mat dxgi_cap::get_img(int is_show)
 
 Mat dc_cap::CaptureScreen(int is_show_windows)
 {
+    if ((GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2) != x)
+    {
+        //cout << 1 << endl;
+        init();
+    }
     // 获取屏幕设备上下文
     HDC hScreenDC = GetDC(NULL);
     // 创建内存设备上下文
@@ -290,6 +297,6 @@ Mat dc_cap::CaptureScreen(int is_show_windows)
 
 void dc_cap::init()
 {
-    x = 960 - 416 / 2;
-    y = 540 - 416 / 2;
+    x = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2;
+    y = GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2;
 }
