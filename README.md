@@ -1,4 +1,5 @@
 # crossfire-yolo-TensorRT   
+## 2024/6/13 今天测试了一下，依然很稳  
 理论支持yolo全系列模型  
 基于yolo-trt的穿越火线ai自瞄  
   
