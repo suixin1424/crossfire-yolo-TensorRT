@@ -18,4 +18,3 @@ main函数中有三个线程，分别为截图+推理，鼠标移动，平滑鼠
 欢迎各位开发者共同改进   
 
  
-[<img src="https://api.gitsponsors.com/api/badge/img?id=597608067" height="20">](https://api.gitsponsors.com/api/badge/link?p=wE5AwclIps9YHEhe+C5hKq0YUSl6tg45+QDZtx7vYUYYExgXrFnBIEtVoTAjrpZ7fdubHQx3vqnTCed8FMLbcMRzRlds7aMe3ZpTu5J3wp4xg0rdHV1jlx+owVmDBgB6MHhMkWsL+fWH+Q/xMsp0Ng==)
